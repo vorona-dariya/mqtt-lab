@@ -66,7 +66,7 @@ int main(void) {
 
     mosquitto_connect_callback_set(mosq, on_connect);
     mosquitto_publish_callback_set(mosq, on_publish);
-
+    mosquitto_loop_start(mosq);
     int rc = mosquitto_connect(mosq, BROKER, PORT, 60);
     if (rc != MOSQ_ERR_SUCCESS) {
         fprintf(stderr, "[publisher] Could not connect: %s\n",
@@ -77,7 +77,7 @@ int main(void) {
     }
 
     /* Start the network loop in background thread */
-    mosquitto_loop_start(mosq);
+    /* mosquitto_loop_start(mosq);*/
 
     char payload[256];
     printf("[publisher] Sending %d messages to topic: %s\n\n", MSG_COUNT, TOPIC);
