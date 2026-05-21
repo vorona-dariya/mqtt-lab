@@ -67,7 +67,7 @@ int main(void) {
     srand((unsigned int)time(NULL));
 
     mosquitto_lib_init();
-
+    printf("[publisher] Starting MQTT publisher...\n");
     struct mosquitto *mosq = mosquitto_new("mqtt-lab-publisher", true, NULL);
     if (!mosq) {
         fprintf(stderr, "[publisher] Failed to create mosquitto instance\n");
