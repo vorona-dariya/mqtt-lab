@@ -14,23 +14,30 @@
 #define BROKER      "localhost"
 #define PORT        1883
 #define TOPIC       "mqtt-lab/test/sensor"
-#define MSG_COUNT   5
+#define MSG_COUNT   6
 #define INTERVAL_S  2
 
 static float temp = 18.0f; 
+static int msg_counter = 0;
+static const int OUTLIER_N = 4;  /* Every 4th message is an outlier */
+
 /* Generate a simple JSON payload with dummy sensor data */
 static void build_payload(char *buf, size_t len) {
     time_t now = time(NULL);
-    struct tm *t = gmtime(&now);
+    struct tm *t = localtime(&now);
     char ts[30];
-    strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%SZ", t);
+    strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", t);
 
     /* Simple simulated values */
-    
+    msg_counter++;
     float delta = ((float)rand() / (float)RAND_MAX) - 0.5f;
     temp += delta;
     if (temp < -30.0f) temp = -30.0f;
     if (temp > 50.0f) temp = 50.0f;
+    float temperature = temp;
+    if (msg_counter % OUTLIER_N == 0) {
+        temperature += 60.0f;
+    }
     float humidity = 50.0f + (float)(rand() % 300) / 10.0f;   /* 50.0 – 80.0 */
 
     snprintf(buf, len,
@@ -38,7 +45,7 @@ static void build_payload(char *buf, size_t len) {
         "\"timestamp\":\"%s\","
         "\"temperature_c\":%.1f,"
         "\"humidity_pct\":%.1f}",
-        ts, temp, humidity);
+        ts, temperature, humidity);
 }
 
 /* Callback: called when connection is established */
