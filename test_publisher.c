@@ -17,12 +17,11 @@
 #define MSG_COUNT   6
 #define INTERVAL_S  2
 
-static float temp = 18.0f; 
 static int msg_counter = 0;
 static const int OUTLIER_N = 4;  /* Every 4th message is an outlier */
 
 /* Generate a simple JSON payload with dummy sensor data */
-static void build_payload(char *buf, size_t len) {
+static void build_payload(char *buf, size_t len, float temp) {
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     char ts[30];
@@ -90,12 +89,13 @@ int main(void) {
 
     /* Start the network loop in background thread */
     mosquitto_loop_start(mosq);
-
+    srand((unsigned int)time(NULL));
+    float temp = -30.0f + (rand() % 800) / 10.0f;
     char payload[256];
     printf("[publisher] Sending %d messages to topic: %s\n\n", MSG_COUNT, TOPIC);
 
     for (int i = 1; i <= MSG_COUNT; i++) {
-        build_payload(payload, sizeof(payload));
+        build_payload(payload, sizeof(payload), temp);
         printf("[publisher] Publishing: %s\n", payload);
 
         rc = mosquitto_publish(mosq, NULL, TOPIC,
