@@ -51,7 +51,7 @@ int publish_message(char* payload, char* topic) {
     printf("[publish_message] Sending message to topic: %s\n", topic);
     printf("[publish_message] Message content: %s\n", payload);
 
-    rc = mosquitto_publish(mosq, NULL, topic, (int)strlen(payload), payload, 1, false);
+    rc = mosquitto_publish(mosq, NULL, topic, (int)strlen(payload), payload, 2, false);
 
     time_t start = time(NULL);
     while(!message_delivered) {
