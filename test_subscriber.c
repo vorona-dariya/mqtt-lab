@@ -54,7 +54,7 @@ static void on_disconnect(struct mosquitto *mosq, void *userdata, int rc) {
 int main(void) {
     mosquitto_lib_init();
 
-    struct mosquitto *mosq = mosquitto_new(NULL, true, NULL);
+    struct mosquitto *mosq = mosquitto_new("mqtt-lab-subscriber", true, NULL);
     if (!mosq) {
         fprintf(stderr, "[subscriber] Failed to create mosquitto instance\n");
         mosquitto_lib_cleanup();

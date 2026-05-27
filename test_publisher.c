@@ -17,23 +17,28 @@
 #define MSG_COUNT   5
 #define INTERVAL_S  2
 
+static float temp = 18.0f; 
 /* Generate a simple JSON payload with dummy sensor data */
-static void build_payload(char *buf, size_t len, int seq) {
+static void build_payload(char *buf, size_t len) {
     time_t now = time(NULL);
     struct tm *t = gmtime(&now);
     char ts[30];
     strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%SZ", t);
 
     /* Simple simulated values */
-    float temp     = 18.0f + (float)(rand() % 100) / 20.0f;   /* 18.0 – 23.0 */
+    
+    float delta = ((float)rand() / (float)RAND_MAX) - 0.5f;
+    temp += delta;
+    if (temp < -30.0f) temp = -30.0f;
+    if (temp > 50.0f) temp = 50.0f;
     float humidity = 50.0f + (float)(rand() % 300) / 10.0f;   /* 50.0 – 80.0 */
 
     snprintf(buf, len,
-        "{\"seq\":%d,\"station_id\":\"S1\","
+        "{\"station_id\":\"S1\","
         "\"timestamp\":\"%s\","
         "\"temperature_c\":%.1f,"
         "\"humidity_pct\":%.1f}",
-        seq, ts, temp, humidity);
+        ts, temp, humidity);
 }
 
 /* Callback: called when connection is established */
@@ -66,7 +71,7 @@ int main(void) {
 
     mosquitto_connect_callback_set(mosq, on_connect);
     mosquitto_publish_callback_set(mosq, on_publish);
-    mosquitto_loop_start(mosq);
+
     int rc = mosquitto_connect(mosq, BROKER, PORT, 60);
     if (rc != MOSQ_ERR_SUCCESS) {
         fprintf(stderr, "[publisher] Could not connect: %s\n",
@@ -77,13 +82,13 @@ int main(void) {
     }
 
     /* Start the network loop in background thread */
-    /* mosquitto_loop_start(mosq);*/
+    mosquitto_loop_start(mosq);
 
     char payload[256];
     printf("[publisher] Sending %d messages to topic: %s\n\n", MSG_COUNT, TOPIC);
 
     for (int i = 1; i <= MSG_COUNT; i++) {
-        build_payload(payload, sizeof(payload), i);
+        build_payload(payload, sizeof(payload));
         printf("[publisher] Publishing: %s\n", payload);
 
         rc = mosquitto_publish(mosq, NULL, TOPIC,
