@@ -3,7 +3,7 @@
 
 char* buffer;
 
-void serialize_to_json(const int station_id, const char timestamp[17], const float temperature, const float humidity) {
+void serialize_to_json(const int station_id, const char timestamp[17], const float temperature, const float humidity, char* buffer) {
     if (station_id < 1) return;
     if (timestamp == NULL || timestamp[0] == '\0') return;
     if (temperature < -30.0f || temperature > 50.0f) return;
