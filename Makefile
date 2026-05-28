@@ -2,7 +2,7 @@ CC      = gcc
 CFLAGS  = -std=c99 -Wall -Wextra
 LDFLAGS = -lmosquitto
 
-TARGETS = test_publisher test_subscriber publish_message
+TARGETS = test_publisher test_subscriber publish_message integration
 
 .PHONY: all clean test
 
@@ -15,6 +15,9 @@ test_subscriber: test_subscriber.c
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 publish_message: publish_message.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+integration: integration.c
 	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 clean:
