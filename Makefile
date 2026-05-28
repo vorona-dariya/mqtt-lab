@@ -1,6 +1,6 @@
 CC      = gcc
 CFLAGS  = -std=c99 -Wall -Wextra
-LDFLAGS = -lmosquitto
+LDFLAGS = -lmosquitto -lcjson
 
 TARGETS = test_publisher test_subscriber publish_message integration
 
